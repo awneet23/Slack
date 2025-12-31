@@ -7,17 +7,18 @@ import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./config/ingest.js"; 
 import chatRoutes from "./routes/chat.route.js"
-
+import cors from "cors";
 
 
  
 const app = express();
-
+app.use(cors({origin:"http://localhost:5173",credentials:true}));
 app.use(clerkMiddleware());
 app.use(express.json());
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
+
 
 
 
