@@ -3,9 +3,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useStreamChat } from "../hooks/useStreamChat";
 import PageLoader from "../components/PageLoader";
-import "../styles/stream-chat-theme.css";
-import { HashIcon, PlusIcon, UsersIcon } from "lucide-react";
-import CreateChannelModal from "../components/CreateChannelModal";
 
 import {
   Chat,
@@ -16,6 +13,14 @@ import {
   Thread,
   Window,
 } from "stream-chat-react";
+
+import "../styles/stream-chat-theme.css";
+import { HashIcon, PlusIcon, UsersIcon } from "lucide-react";
+import CreateChannelModal from "../components/CreateChannelModal";
+import CustomChannelPreview from "../components/CustomChannelPreview";
+import UsersList from "../components/UsersList";
+// import CustomChannelHeader from "../components/CustomChannelHeader";
+
 const HomePage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeChannel, setActiveChannel] = useState(null);
@@ -33,6 +38,8 @@ const HomePage = () => {
       }
     }
   }, [chatClient, searchParams]);
+
+  // todo: handle this with a better component
   if (error) return <p>Something went wrong...</p>;
   if (isLoading || !chatClient) return <PageLoader />;
 
@@ -69,15 +76,15 @@ const HomePage = () => {
                 <ChannelList
                   filters={{ members: { $in: [chatClient?.user?.id] } }}
                   options={{ state: true, watch: true }}
-                  // Preview={({ channel }) => (
-                  //   <CustomChannelPreview
-                  //     channel={channel}
-                  //     activeChannel={activeChannel}
-                  //     setActiveChannel={(channel) =>
-                  //       setSearchParams({ channel: channel.id })
-                  //     }
-                  //   />
-                  // )}
+                  Preview={({ channel }) => (
+                    <CustomChannelPreview
+                      channel={channel}
+                      activeChannel={activeChannel}
+                      setActiveChannel={(channel) =>
+                        setSearchParams({ channel: channel.id })
+                      }
+                    />
+                  )}
                   List={({ children, loading, error }) => (
                     <div className="channel-sections">
                       <div className="section-header">
@@ -107,7 +114,7 @@ const HomePage = () => {
                           <span>Direct Messages</span>
                         </div>
                       </div>
-                      {/* <UsersList activeChannel={activeChannel} /> */}
+                      <UsersList activeChannel={activeChannel} />
                     </div>
                   )}
                 />
@@ -116,17 +123,17 @@ const HomePage = () => {
           </div>
 
           {/* RIGHT CONTAINER */}
-          {/* <div className="chat-main">
+          <div className="chat-main">
             <Channel channel={activeChannel}>
               <Window>
-                <CustomChannelHeader />
+                {/* <CustomChannelHeader /> */}
                 <MessageList />
                 <MessageInput />
               </Window>
 
               <Thread />
             </Channel>
-          </div> */}
+          </div>
         </div>
 
         {isCreateModalOpen && (
