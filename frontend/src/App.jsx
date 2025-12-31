@@ -1,33 +1,47 @@
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/clerk-react";
-import { Routes, Route, Navigate } from "react-router";
-import HomePage from "./pages/HomePage";
+import { useAuth } from "@clerk/clerk-react";
+import { Navigate, Route, Routes } from "react-router";
 import AuthPage from "./pages/AuthPage";
+import HomePage from "./pages/HomePage";
 // import toast from "react-hot-toast";
 import * as Sentry from "@sentry/react";
+import CallPage from "./pages/CallPage";
 const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 function App() {
+  const { isSignedIn, isLoaded } = useAuth();
+  if (!isLoaded) return null;
   return (
-    <>
-      <SignedIn>
-        <SentryRoutes>
-          <Route path="/" element={<HomePage></HomePage>}></Route>
-          <Route path="/auth" element={<Navigate to={"/"} />}></Route>
-        </SentryRoutes>
-        <UserButton />
-      </SignedIn>
-      <SignedOut>
-        <SentryRoutes>
-          <Route path="/auth" element={<AuthPage></AuthPage>}></Route>
-          <Route path="*" element={<Navigate to={"/auth"} />}></Route>
-        </SentryRoutes>
-        <SignInButton />
-      </SignedOut>
-    </>
+    <SentryRoutes>
+      <Route
+        path="/"
+        element={isSignedIn ? <HomePage /> : <Navigate to={"/auth"} replace />}
+      />
+      <Route
+        path="/auth"
+        element={!isSignedIn ? <AuthPage /> : <Navigate to={"/"} replace />}
+      />
+
+      <Route
+        path="/call/:id"
+        element={isSignedIn ? <CallPage /> : <Navigate to={"/auth"} replace />}
+      />
+
+      <Route
+        path="*"
+        element={
+          isSignedIn ? (
+            <Navigate to={"/"} replace />
+          ) : (
+            <Navigate to={"/auth"} replace />
+          )
+        }
+      />
+    </SentryRoutes>
   );
 }
 export default App;
+
+//  {isSignedIn && (
+//         <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 1000 }}>
+//            <UserButton />
+//         </div>
+//       )}
